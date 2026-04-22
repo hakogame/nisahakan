@@ -323,7 +323,7 @@ body{
 </div>
 
 <audio id="loveSound" preload="auto">
-    <source src="oyunses.m4a" type="audio/mpeg">
+    <source src="oyunses.m4a" type="audio/mp4">
 </audio>
 
 <script>
@@ -471,7 +471,7 @@ function startGame(){
     score = 0;
     speed = 4;
     gameOver = false;
-
+loveSound.play(); 
     document.getElementById("score").innerText="Skor: 0";
     document.getElementById("gameOver").style.display="none";
     document.getElementById("gameArea").innerHTML="";
@@ -572,7 +572,20 @@ document.body.addEventListener("click", ()=>{
     });
 },{once:true});
 
+function unlockAudio(){
+    const audio = document.getElementById("loveSound");
 
+    if(!audio) return;
+
+    audio.play().then(()=>{
+        audio.pause();
+        audio.currentTime = 0;
+    }).catch(()=>{});
+}
+
+// iPhone için en kritik tetikleyici
+document.addEventListener("touchstart", unlockAudio, { once:true });
+document.addEventListener("click", unlockAudio, { once:true });
 
 
 </script>
