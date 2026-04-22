@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nisa ❤️ Hakan</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI';
+    background:#0b0b0f;
+    color:white;
+    overflow-x:hidden;
+}
+
+/* 🌌 ARKA PLAN */
+#bg{
+    position:fixed;
+    width:100%;
+    height:100%;
+    z-index:-1;
+}
+
+.star{
+    position:absolute;
+    width:2px;
+    height:2px;
+    background:white;
+    opacity:0.8;
+    animation:fall linear infinite;
+}
+
+@keyframes fall{
+    from{transform:translateY(0);}
+    to{transform:translateY(100vh);}
+}
+
+/* HEADER */
+.header{text-align:center;padding:30px;}
+.title{
+    font-size:30px;
+    background:linear-gradient(90deg,#ff4d6d,#1db954);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.subtitle{color:#aaa}
+
+/* TIMELINE */
+.timeline{margin:20px}
+.bar{height:8px;background:#222;border-radius:20px}
+.fill{
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg,#ff4d6d,#1db954);
+    border-radius:20px;
+}
+.years{display:flex;justify-content:space-between;font-size:12px;color:#888}
+
+/* SONG */
+.songs{padding:20px}
+.song{
+    background:#181818;
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+}
+.song button{
+    background:#1db954;
+    border:none;
+    border-radius:20px;
+    padding:8px 15px;
+    color:white;
+}
+
+/* PLAYER */
+#player{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:#121212;
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+#cover{
+    width:260px;
+    border-radius:20px;
+    box-shadow:0 10px 40px black;
+    transition:0.5s;
+}
+
+/* progress */
+#progress{width:80%}
+#time{font-size:12px;color:#aaa}
+
+/* CONTROLS */
+.controls{
+    margin-top:15px;
+}
+
+.controls button{
+    font-size:22px;
+    margin:0 10px;
+    background:#1db954;
+    border:none;
+    border-radius:50%;
+    width:50px;
+    height:50px;
+    color:white;
+    transition:0.2s;
+}
+
+.controls button:hover{
+    transform:scale(1.1);
+}
+
+#close{
+    position:absolute;
+    top:20px;
+    left:20px;
+    font-size:20px;
+    cursor:pointer;
+}
+/* PLAYER ARKA PLAN GRADYENT */
+#player::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+
+    /* 🎨 YUMUŞAK RENKLER */
+    background: var(--dynamicGradient);
+
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+
+    opacity:0.15; /* 🔥 EN ÖNEMLİ KISIM (düşürdük) */
+
+    mix-blend-mode: screen; /* 🔥 siyahı korur */
+
+    z-index:-1;
+}
+
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+#player{
+    background:#0b0b0f; /* 🔥 sabit koyu zemin */
+    position:fixed;
+    overflow:hidden;
+}
+
+
+
+#gameScreen{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:#0b0b0f;
+    display:none;
+    z-index:9999;
+    overflow:hidden;
+}
+
+#gameUI{
+    position:absolute;
+    top:10px;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    padding:10px 20px;
+    color:white;
+    z-index:2;
+}
+
+#score{
+    font-size:18px;
+}
+
+#closeGame{
+    cursor:pointer;
+    font-size:20px;
+}
+
+#gameArea{
+    position:absolute;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+.heart, .bomb{
+    position:absolute;
+    font-size:30px;
+    cursor:pointer;
+    animation: fall linear;
+}
+
+@keyframes fall{
+    from{transform:translateY(-100px);}
+    to{transform:translateY(110vh);}
+}
+
+#gameOver{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    display:none;
+}
+
+#gameOver button{
+    padding:10px 20px;
+    border:none;
+    border-radius:20px;
+    background:#1db954;
+    color:white;
+}
+
+.heart, .bomb{
+    position:absolute;
+    font-size:34px;
+    cursor:pointer;
+    animation: fall linear;
+    user-select:none;
+}
+
+.heart{
+    filter: drop-shadow(0 0 8px #ff4d6d);
+}
+
+.bomb{
+    filter: drop-shadow(0 0 8px #000);
+}
+
+.bomb{
+    color: white;
+    font-size: 34px;
+    filter: drop-shadow(0 0 10px black);
+}
+
+.heart{
+    color: red;
+    font-size: 34px;
+    filter: drop-shadow(0 0 10px #ff4d6d);
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+
+<div class="header">
+    <div class="title">Nisa ❤️ Hakan</div>
+    <div class="subtitle">6 yıldır birlikteyiz</div>
+</div>
+
+<div class="timeline">
+    <div class="bar"><div class="fill"></div></div>
+    <div class="years"><span>2020</span><span>2026</span></div>
+</div>
+
+<div class="songs">
+    <div class="song"><span>Şarkımız 1</span><button onclick="openPlayer(0)">▶ Oynat</button></div>
+    <div class="song"><span>Şarkımız 2</span><button onclick="openPlayer(1)">▶ Oynat</button></div>
+    <div class="song"><span>Şarkımız 3</span><button onclick="openPlayer(2)">▶ Oynat</button></div>
+    <div class="song"><span>Şarkımız 4</span><button onclick="openPlayer(3)">▶ Oynat</button></div>
+</div>
+
+<div id="player">
+    <div id="close" onclick="closePlayer()">✖</div>
+
+    <img id="cover">
+    <h2 id="title"></h2>
+
+    <input type="range" id="progress">
+    <div id="time"></div>
+
+    <div class="controls">
+        <button onclick="prev()">⏮</button>
+        <button onclick="togglePlay()" id="playBtn">⏸</button>
+        <button onclick="next()">⏭</button>
+    </div>
+</div>
+
+<audio id="audio"></audio>
+
+<div class="songs">
+    <h2>🎮 Oyunlar</h2>
+
+    <div class="song">
+        <span>❤️ Kalp Yakalama Oyunu</span>
+        <button onclick="openGame()">Oyna</button>
+    </div>
+</div>
+
+<div id="gameScreen">
+    <div id="gameUI">
+        <div id="score">Skor: 0</div>
+        <div id="closeGame" onclick="closeGame()">✖</div>
+    </div>
+
+    <div id="gameArea"></div>
+
+    <div id="gameOver">
+        <h2>💥 Oyun Bitti</h2>
+        <p id="finalScore"></p>
+        <button onclick="restartGame()">Tekrar Oyna</button>
+    </div>
+</div>
+
+<audio id="loveSound" preload="auto">
+    <source src="oyunses.m4a" type="audio/mpeg">
+</audio>
+
+<script>
+
+/* 🌌 STARS */
+for(let i=0;i<80;i++){
+    let s=document.createElement("div");
+    s.className="star";
+    s.style.left=Math.random()*100+"vw";
+    s.style.top=Math.random()*100+"vh";
+    s.style.animationDuration=(Math.random()*5+3)+"s";
+    document.getElementById("bg").appendChild(s);
+}
+
+/* SONG LIST */
+const songs=[
+    {src:"sarkimiz1.mp3",img:"1.png",title:"Şarkımız 1"},
+    {src:"sarkimiz2.mp3",img:"2.png",title:"Şarkımız 2"},
+    {src:"sarkimiz3.mp3",img:"3.png",title:"Şarkımız 3"},
+    {src:"sarkimiz.mp3",img:"4.png",title:"Şarkımız 4"},
+];
+
+let index=0;
+
+const audio=document.getElementById("audio");
+const cover=document.getElementById("cover");
+const title=document.getElementById("title");
+const progress=document.getElementById("progress");
+const time=document.getElementById("time");
+const player=document.getElementById("player");
+const playBtn=document.getElementById("playBtn");
+
+/* OPEN */
+function openPlayer(i){
+    index=i;
+    loadSong();
+    player.style.display="flex";
+}
+
+/* LOAD */
+function loadSong(){
+    let s=songs[index];
+    audio.src=s.src;
+    cover.src=s.img;
+    title.innerText=s.title;
+    audio.play();
+    playBtn.innerText="⏸";
+}
+
+/* CONTROLS */
+function togglePlay(){
+    if(audio.paused){
+        audio.play();
+        playBtn.innerText="⏸";
+    }else{
+        audio.pause();
+        playBtn.innerText="▶";
+    }
+}
+
+function next(){
+    index=(index+1)%songs.length;
+    loadSong();
+}
+
+function prev(){
+    index=(index-1+songs.length)%songs.length;
+    loadSong();
+}
+
+/* AUTO NEXT */
+audio.addEventListener("ended",next);
+
+/* PROGRESS */
+audio.addEventListener("timeupdate",()=>{
+    let p=(audio.currentTime/audio.duration)*100;
+    progress.value=p||0;
+    time.innerHTML=format(audio.currentTime)+" / "+format(audio.duration);
+});
+
+progress.addEventListener("input",()=>{
+    audio.currentTime=(progress.value/100)*audio.duration;
+});
+
+/* FORMAT */
+function format(s){
+    let m=Math.floor(s/60);
+    let sec=Math.floor(s%60);
+    return m+":"+(sec<10?"0"+sec:sec);
+}
+
+/* CLOSE */
+function closePlayer(){
+    audio.pause();
+    player.style.display="none";
+}
+
+function loadSong(){
+    let s=songs[index];
+
+    audio.src=s.src;
+    cover.src=s.img;
+    title.innerText=s.title;
+
+    // 🎨 her şarkıya farklı renk
+ const colors = [
+ "linear-gradient(-45deg,#ff4d6d,#1db954)",
+ "linear-gradient(-45deg,#ff758c,#ff7eb3)",
+ "linear-gradient(-45deg,#667eea,#764ba2)",
+ "linear-gradient(-45deg,#43cea2,#185a9d)"
+];
+
+    document.getElementById("player").style.setProperty(
+    "--dynamicGradient",
+    colors[index]
+);
+
+
+    audio.play();
+}
+
+
+
+
+
+
+
+
+
+let score = 0;
+let speed = 4;
+let gameOver = false;
+
+let spawnInterval;
+
+const loveSound = document.getElementById("loveSound");
+
+function openGame(){
+    document.getElementById("gameScreen").style.display="block";
+    startGame();
+}
+
+function startGame(){
+
+    score = 0;
+    speed = 4;
+    gameOver = false;
+
+    document.getElementById("score").innerText="Skor: 0";
+    document.getElementById("gameOver").style.display="none";
+    document.getElementById("gameArea").innerHTML="";
+
+    spawnInterval = setInterval(()=>{
+        spawnItem();
+    }, 700);
+}
+
+
+
+function spawnItem(){
+
+    if(gameOver) return;
+
+    const area = document.getElementById("gameArea");
+    let el = document.createElement("div");
+
+    let isBomb = Math.random() < 0.2;
+
+    el.className = isBomb ? "bomb" : "heart";
+    el.innerHTML = isBomb ? "💣" : "❤️";
+
+    el.style.left = Math.random()*90 + "vw";
+    el.style.animationDuration = speed + "s";
+
+    area.appendChild(el);
+
+let dropTimeout = setTimeout(()=>{
+
+    if(!el.parentNode || gameOver) return;
+
+    // ❤️ sadece kalp düşerse oyun bitsin
+    if(!isBomb){
+        endGame("miss");
+    }
+
+    el.remove();
+
+}, speed * 1000);
+    // ❤️ tıklama
+    el.addEventListener("click", ()=>{
+
+        if(gameOver) return;
+
+        clearTimeout(dropTimeout); // 🔥 timeout iptal
+
+        if(isBomb){
+            endGame("bomb");
+            el.remove();
+            return;
+        }
+
+        loveSound.currentTime = 0;
+        loveSound.play();
+
+        score++;
+        document.getElementById("score").innerText="Skor: "+score;
+
+        if(score % 5 === 0 && speed > 1.5){
+            speed -= 0.4;
+        }
+
+        el.remove();
+    });
+}
+function endGame(type){
+
+    gameOver = true;
+
+    clearInterval(spawnInterval);
+    document.getElementById("gameArea").innerHTML="";
+
+    let msg="";
+
+    if(type==="bomb") msg="💣 Bombaya bastın!";
+    if(type==="miss") msg="💔 Bir kalbi kaçırdın!";
+
+    document.getElementById("gameOver").style.display="block";
+    document.getElementById("finalScore").innerText =
+        msg + " Skor: " + score;
+}
+
+function restartGame(){
+    startGame();
+}
+
+
+
+loveSound.pause();
+loveSound.currentTime = 0;
+loveSound.play().catch(()=>{});
+
+document.body.addEventListener("click", ()=>{
+    loveSound.play().then(()=>{
+        loveSound.pause();
+        loveSound.currentTime = 0;
+    });
+},{once:true});
+
+
+
+
+</script>
+
+</body>
+</html>
